@@ -1,0 +1,100 @@
+{
+  "name": "refund_approval",
+  "description": "Decide whether a refund request is approved automatically, reviewed by a human, or declined.",
+  "policy_file": "policy.txt",
+  "features": [
+    {
+      "name": "amount_band",
+      "values": [
+        "LOW",
+        "MID",
+        "HIGH"
+      ],
+      "description": "order value",
+      "value_descriptions": {
+        "LOW": "under $50",
+        "MID": "$50 to $500",
+        "HIGH": "over $500"
+      }
+    },
+    {
+      "name": "days_since_purchase",
+      "values": [
+        "D30",
+        "D90",
+        "OVER90"
+      ],
+      "description": "time since purchase",
+      "value_descriptions": {
+        "D30": "0-30 days",
+        "D90": "31-90 days",
+        "OVER90": "more than 90 days"
+      }
+    },
+    {
+      "name": "reason",
+      "values": [
+        "DEFECTIVE",
+        "NOT_AS_DESCRIBED",
+        "NOT_RECEIVED",
+        "CHANGED_MIND"
+      ],
+      "description": "customer's stated reason"
+    },
+    {
+      "name": "customer_history",
+      "values": [
+        "GOOD",
+        "NEW",
+        "FLAGGED"
+      ],
+      "description": "standing of the customer",
+      "value_descriptions": {
+        "GOOD": "established, no abuse",
+        "NEW": "first orders",
+        "FLAGGED": "flagged for abuse"
+      }
+    }
+  ],
+  "outputs": {
+    "APPROVE": "refund automatically",
+    "REVIEW": "send to a human agent",
+    "DECLINE": "reject the request"
+  },
+  "safe_default": "REVIEW",
+  "invariants": [
+    {
+      "name": "high-value refunds are never auto-approved",
+      "when": {
+        "amount_band": [
+          "HIGH"
+        ]
+      },
+      "never": [
+        "APPROVE"
+      ]
+    },
+    {
+      "name": "flagged customers are never auto-approved",
+      "when": {
+        "customer_history": [
+          "FLAGGED"
+        ]
+      },
+      "never": [
+        "APPROVE"
+      ]
+    },
+    {
+      "name": "nothing after 90 days is approved",
+      "when": {
+        "days_since_purchase": [
+          "OVER90"
+        ]
+      },
+      "never": [
+        "APPROVE"
+      ]
+    }
+  ]
+}
