@@ -1,4 +1,4 @@
-# decisionforge
+# decisionforge (LLM Compiler)
 
 **Use an LLM to *write* a decision policy once, under human supervision, then run a frozen, signed, verifiable decision table with no LLM in the decision path.**
 
